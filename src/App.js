@@ -13,7 +13,7 @@ function App() {
           path="/:pokemonId"
           render={(props) => <Pokemon {...props} />}
         />
-        <Redirect path="/" component={Pokemon} />
+        <Redirect to="/" />
       </Switch>
     </>
   );
