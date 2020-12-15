@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AppBar,
   Card,
@@ -10,8 +10,8 @@ import {
   Typography,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import axios from 'axios';
 
-import mockData from '../mockData';
 import { toCaptialize } from '../utils';
 
 const useStyles = makeStyles({
@@ -35,11 +35,39 @@ const useStyles = makeStyles({
 
 export const Pokedex = (props) => {
   const classes = useStyles();
-  const [pokemonData, setPokemonData] = useState(mockData);
+  const [pokemonData, setPokemonData] = useState({});
+
+  const downloadPokeDexData = () => {
+    axios
+      .get(`https://pokeapi.co/api/v2/pokemon?limit=807`)
+      .then((res) => {
+        console.log(res);
+        const { data } = res;
+        const { results } = data;
+        const newPokemonData = {};
+        results.forEach((pokemon, index) => {
+          newPokemonData[index + 1] = {
+            id: index + 1,
+            name: pokemon.name,
+            sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${
+              index + 1
+            }.png`,
+          };
+        });
+        setPokemonData(newPokemonData);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    downloadPokeDexData();
+  }, []);
 
   const getPokemonCard = (pokemonId) => {
-    const { id, name } = pokemonData[`${pokemonId}`];
-    const sprite = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+    const { id, name, sprite } = pokemonData[pokemonId];
+
     return (
       <Grid item xs={12} sm={4} key={pokemonId}>
         <Card onClick={() => props.history.push(`/${pokemonId}`)}>

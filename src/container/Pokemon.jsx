@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
-import { Typography } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import { Button, CircularProgress, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import axios from 'axios';
 
-import mockData from '../mockData';
 import { toCaptialize } from '../utils';
 
 const useStyles = makeStyles({
   pokemonCard: {
+    color: '#FBFBFF',
+  },
+  backBtn: {
+    borderColor: '#FBFBFF',
     color: '#FBFBFF',
   },
 });
@@ -16,14 +20,27 @@ export const Pokemon = (props) => {
   const { match } = props;
   const { params } = match;
   const { pokemonId } = params;
-  const [pokemon, setPokemon] = useState(mockData[`${pokemonId}`]);
+  const [pokemon, setPokemon] = useState(undefined);
+
+  useEffect(() => {
+    axios
+      .get(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
+      .then((res) => {
+        console.log(res);
+        const { data } = res;
+        setPokemon(data);
+      })
+      .catch((err) => {
+        setPokemon(false);
+      });
+  }, [pokemonId]);
 
   const getPokemon = () => {
     const { name, id, species, height, weight, types, sprites } = pokemon;
     const fullImageUrl = `https://pokeres.bastionbot.org/images/pokemon/${id}.png`;
     const { front_default } = sprites;
     return (
-      <div className={classes.pokemonCard}>
+      <>
         <Typography variant="h1">
           {`${id}. ${toCaptialize(name)}`}
           <img src={front_default} alt="pokemonImg" />
@@ -46,8 +63,32 @@ export const Pokemon = (props) => {
           const { name } = type;
           return <Typography key={name}>{name}</Typography>;
         })}
-      </div>
+        <Button
+          variant="outlined"
+          className={classes.backBtn}
+          onClick={() => props.history.push('/')}
+        >
+          Pokedex
+        </Button>
+      </>
     );
   };
-  return <>{getPokemon()}</>;
+  return (
+    <div className={classes.pokemonCard}>
+      {pokemon === undefined && <CircularProgress size={50} thickness={5} />}
+      {pokemon !== undefined && pokemon && getPokemon()}
+      {pokemon === false && (
+        <>
+          <Typography>Pokemon Not Found</Typography>
+          <Button
+            variant="outlined"
+            className={classes.backBtn}
+            onClick={() => props.history.push('/')}
+          >
+            Pokedex
+          </Button>
+        </>
+      )}
+    </div>
+  );
 };
