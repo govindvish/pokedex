@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, CircularProgress, Typography } from '@material-ui/core';
+import { Button, CircularProgress, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios';
 
@@ -11,6 +11,9 @@ const useStyles = makeStyles({
   },
   backBtn: {
     borderColor: '#FBFBFF',
+    color: '#FBFBFF',
+  },
+  spinner: {
     color: '#FBFBFF',
   },
 });
@@ -75,7 +78,15 @@ export const Pokemon = (props) => {
   };
   return (
     <div className={classes.pokemonCard}>
-      {pokemon === undefined && <CircularProgress size={50} thickness={5} />}
+      {pokemon === undefined && (
+        <Grid container justify="center" alignContent="center">
+          <CircularProgress
+            className={classes.spinner}
+            size={50}
+            thickness={5}
+          />
+        </Grid>
+      )}
       {pokemon !== undefined && pokemon && getPokemon()}
       {pokemon === false && (
         <>
