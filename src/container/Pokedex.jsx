@@ -146,8 +146,19 @@ export const Pokedex = (props) => {
       </AppBar>
       {pokemonData ? (
         <Grid container spacing={2} className={classes.pokedexContainer}>
-          {Object.keys(pokemonData).map(
-            (id) => pokemonData[id].name.includes(filter) && getPokemonCard(id)
+          {Object.keys(pokemonData).length !== 0 ? (
+            Object.keys(pokemonData).map(
+              (id) =>
+                pokemonData[id].name.includes(filter) && getPokemonCard(id)
+            )
+          ) : (
+            <Grid container justify="center" alignContent="center">
+              <CircularProgress
+                className={classes.spinner}
+                size={50}
+                thickness={5}
+              />
+            </Grid>
           )}
         </Grid>
       ) : (
